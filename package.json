@@ -2,10 +2,6 @@
   "name": "breaking-chains",
   "version": "1.0.0",
   "scripts": {
-    "upload-build": "scripts\\upload-build.bat",
-    "seed-db": "node scripts\\seed-firestore.js"
-  },
-  "dependencies": {
-    "firebase-admin": "^14.2.0"
+    "upload-build": "scripts\\upload-build.bat"
   }
 }
