@@ -13,7 +13,7 @@ class Converters {
     fun toUserRole(roleStr: String): UserRole {
         return try {
             UserRole.valueOf(roleStr)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             UserRole.USER
         }
     }

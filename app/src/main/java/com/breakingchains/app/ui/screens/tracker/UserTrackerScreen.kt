@@ -1,19 +1,36 @@
 package com.breakingchains.app.ui.screens.tracker
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -118,7 +135,7 @@ fun UserTrackerScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // 1. Calendar View Card
+            // Calendar View Card
             CalendarMonthView(
                 monthName = state.monthName,
                 soberDays = state.soberDaysSet,
@@ -130,7 +147,7 @@ fun UserTrackerScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 2. Milestones Reached Section
+            // Milestones Reached Section
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -173,7 +190,7 @@ fun UserTrackerScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 3. Streak Analytics Section
+            // Streak Analytics Section
             Text(
                 text = "Streak Analytics",
                 style = MaterialTheme.typography.titleLarge.copy(
@@ -192,7 +209,7 @@ fun UserTrackerScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 4. Motivational Quote Card with Floating Action Button (+)
+            // Motivational Quote Card with Floating Action Button (+)
             PersonalNoteCard(
                 onAddClick = onNavigateToLogRelapse
             )

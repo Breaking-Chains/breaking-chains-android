@@ -2,7 +2,7 @@ package com.breakingchains.app.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Brand Primary & Accent Palette (Matching Reference UI Aesthetic)
+// Brand Primary & Accent Palette
 val DeepTeal = Color(0xFF235A68)
 val DeepTealDark = Color(0xFF163E48)
 val DeepTealLight = Color(0xFF327485)
@@ -22,3 +22,14 @@ val SoftRedBg = Color(0xFFFEE2E2)
 val TextPrimaryDark = Color(0xFF0F172A)
 val TextSecondaryMuted = Color(0xFF64748B)
 val BorderSubtle = Color(0xFFE2E8F0)
+
+// Slate Palette
+val Slate100 = Color(0xFFF1F5F9)
+val Slate200 = Color(0xFFE2E8F0)
+val Slate300 = Color(0xFFCBD5E1)
+val Slate500 = Color(0xFF64748B)
+val Slate600 = Color(0xFF475569)
+val Slate800 = Color(0xFF1E293B)
+val Slate900 = Color(0xFF0F172A)
+
+val DividerColor = Color(0xFFF1F5F9)

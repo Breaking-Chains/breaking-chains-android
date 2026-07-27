@@ -35,17 +35,3 @@ fun RelapseLog.toEntity(): RelapseLogEntity {
         severity = severity
     )
 }
-
-data class Milestone(
-    val title: String,
-    val subtitle: String,
-    val requiredDays: Int,
-    val isUnlocked: Boolean,
-    val iconType: MilestoneIcon
-)
-
-enum class MilestoneIcon {
-    MEDAL,
-    RIBBON,
-    LOCK
-}

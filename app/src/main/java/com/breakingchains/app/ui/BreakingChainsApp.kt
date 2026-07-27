@@ -9,11 +9,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.breakingchains.app.data.local.AppDatabase
 import com.breakingchains.app.data.model.UserRole
-import com.breakingchains.app.data.repository.AuthRepositoryImpl
-import com.breakingchains.app.data.repository.CallRequestRepositoryImpl
-import com.breakingchains.app.data.repository.TrackerRepositoryImpl
+import com.breakingchains.app.di.DefaultAppContainer
 import com.breakingchains.app.ui.navigation.Screen
 import com.breakingchains.app.ui.screens.admin.AdminDashboardScreen
 import com.breakingchains.app.ui.screens.auth.AuthViewModel
@@ -23,10 +20,10 @@ import com.breakingchains.app.ui.screens.auth.RegisterScreen
 import com.breakingchains.app.ui.screens.relapse.RelapseLogScreen
 import com.breakingchains.app.ui.screens.relapse.RelapseLogViewModel
 import com.breakingchains.app.ui.screens.schedule.ScheduleCallScreen
+import com.breakingchains.app.ui.screens.schedule.ScheduleCallViewModel
 import com.breakingchains.app.ui.screens.tracker.TrackerViewModel
 import com.breakingchains.app.ui.screens.tracker.UserTrackerScreen
 import com.breakingchains.app.ui.theme.BreakingChainsTheme
-import com.google.firebase.firestore.FirebaseFirestore
 
 @Composable
 fun BreakingChainsApp() {
@@ -34,20 +31,21 @@ fun BreakingChainsApp() {
         val context = LocalContext.current
         val navController = rememberNavController()
 
-        // Firebase Firestore Instance safely retrieved
-        val firestore = remember {
-            runCatching { FirebaseFirestore.getInstance() }.getOrNull()
+        // Clean DI Container initialization
+        val appContainer = remember(context) { DefaultAppContainer(context) }
+
+        val authViewModel: AuthViewModel = viewModel {
+            AuthViewModel(appContainer.authRepository)
         }
-
-        // Room Database & Offline-First Repositories
-        val database = remember { AppDatabase.getInstance(context) }
-        val authRepository = remember { AuthRepositoryImpl(database.userDao(), firestore) }
-        val trackerRepository = remember { TrackerRepositoryImpl(database.relapseLogDao(), database.userDao(), firestore) }
-        val callRequestRepository = remember { CallRequestRepositoryImpl(database.callRequestDao(), firestore) }
-
-        val authViewModel: AuthViewModel = viewModel { AuthViewModel(authRepository) }
-        val trackerViewModel: TrackerViewModel = viewModel { TrackerViewModel(authRepository, trackerRepository) }
-        val relapseLogViewModel: RelapseLogViewModel = viewModel { RelapseLogViewModel(authRepository, trackerRepository) }
+        val trackerViewModel: TrackerViewModel = viewModel {
+            TrackerViewModel(appContainer.authRepository, appContainer.trackerRepository)
+        }
+        val relapseLogViewModel: RelapseLogViewModel = viewModel {
+            RelapseLogViewModel(appContainer.authRepository, appContainer.trackerRepository)
+        }
+        val scheduleCallViewModel: ScheduleCallViewModel = viewModel {
+            ScheduleCallViewModel(appContainer.authRepository, appContainer.callRequestRepository)
+        }
 
         val currentUser by authViewModel.currentUser.collectAsState()
         val loginState by authViewModel.loginState.collectAsState()
@@ -55,6 +53,7 @@ fun BreakingChainsApp() {
         val forgotPasswordState by authViewModel.forgotPasswordState.collectAsState()
         val trackerUiState by trackerViewModel.uiState.collectAsState()
         val relapseLogUiState by relapseLogViewModel.uiState.collectAsState()
+        val scheduleCallUiState by scheduleCallViewModel.uiState.collectAsState()
 
         val startDestination = if (currentUser != null) {
             if (currentUser?.role == UserRole.ADMIN) Screen.AdminDashboard.route else Screen.UserTracker.route
@@ -152,6 +151,15 @@ fun BreakingChainsApp() {
 
             composable(Screen.ScheduleCall.route) {
                 ScheduleCallScreen(
+                    state = scheduleCallUiState,
+                    onDateChanged = scheduleCallViewModel::onDateChanged,
+                    onTimeChanged = scheduleCallViewModel::onTimeChanged,
+                    onReasonNoteChanged = scheduleCallViewModel::onReasonNoteChanged,
+                    onSubmitClick = {
+                        scheduleCallViewModel.submitScheduleCall {
+                            navController.popBackStack()
+                        }
+                    },
                     onNavigateBack = { navController.popBackStack() }
                 )
             }

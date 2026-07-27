@@ -27,7 +27,7 @@ class TrackerRepositoryImpl(
     private val firestore: FirebaseFirestore? = null
 ) : TrackerRepository {
 
-    // 1. Single Source of Truth: UI always observes Room DB
+    // Single Source of Truth: UI always observes Room DB
     override fun getRelapseLogs(userId: String): Flow<List<RelapseLog>> {
         return relapseLogDao.getLogsForUser(userId).map { list ->
             list.map { it.toDomainModel() }
@@ -54,7 +54,7 @@ class TrackerRepositoryImpl(
             severity = severity
         )
 
-        // 2. Offline-First: Write to Room DB immediately (Zero latency)
+        // Offline-First: Write to Room DB immediately
         relapseLogDao.insertLog(newLog.toEntity())
 
         // Reset user active streak days in Room DB
@@ -63,7 +63,7 @@ class TrackerRepositoryImpl(
             userDao.updateUser(userEntity.copy(activeStreakDays = 0))
         }
 
-        // 3. Fire-and-forget background sync to Firestore
+        // Background sync to Firestore
         syncRelapseLogToFirestoreInBackground(newLog)
     }
 
@@ -84,7 +84,7 @@ class TrackerRepositoryImpl(
 
                 // Also update user streak in Firestore
                 firestore.collection("users").document(log.userId).update("activeStreakDays", 0)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Fail quietly if offline; Room DB holds local data
             }
         }

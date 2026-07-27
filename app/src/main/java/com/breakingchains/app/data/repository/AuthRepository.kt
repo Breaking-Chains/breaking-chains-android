@@ -42,7 +42,7 @@ class AuthRepositoryImpl(
             return AuthResult.Error("Email and password cannot be empty.")
         }
 
-        // 1. Single Source of Truth: Read from Room DB first (Zero latency)
+        // Single Source of Truth: Read from Room DB first
         var userEntity = userDao.getUserByEmail(cleanEmail)
 
         if (userEntity != null) {
@@ -54,14 +54,14 @@ class AuthRepositoryImpl(
                 }
                 val user = userEntity.toDomainModel()
                 _currentUser.value = user
-                syncUserToFirestoreInBackground(user, password)
+                syncUserToFirestoreInBackground(user)
                 return AuthResult.Success(user)
             } else {
                 return AuthResult.Error("Password must be at least 6 characters long.")
             }
         }
 
-        // 2. Demo/Onboarding Fallback: If account not in local Room DB yet, create local entry
+        // Fallback: If account not in local Room DB yet, create local entry
         if (password.length >= 6) {
             val role = if (isAdminEmail(cleanEmail)) UserRole.ADMIN else UserRole.USER
             val newUserEntity = UserEntity(
@@ -76,7 +76,7 @@ class AuthRepositoryImpl(
             userDao.insertUser(newUserEntity)
             val user = newUserEntity.toDomainModel()
             _currentUser.value = user
-            syncUserToFirestoreInBackground(user, password)
+            syncUserToFirestoreInBackground(user)
             return AuthResult.Success(user)
         }
 
@@ -115,18 +115,18 @@ class AuthRepositoryImpl(
             activeStreakDays = 0
         )
 
-        // 1. Write to Room DB immediately (Offline-First)
+        // Write to Room DB immediately (Offline-First)
         userDao.insertUser(newUserEntity)
         val user = newUserEntity.toDomainModel()
         _currentUser.value = user
 
-        // 2. Fire-and-forget background sync to Firestore
-        syncUserToFirestoreInBackground(user, password)
+        // Background sync to Firestore
+        syncUserToFirestoreInBackground(user)
 
         return AuthResult.Success(user)
     }
 
-    private fun syncUserToFirestoreInBackground(user: User, passwordHash: String) {
+    private fun syncUserToFirestoreInBackground(user: User) {
         if (firestore == null) return
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -141,7 +141,7 @@ class AuthRepositoryImpl(
                     "lastSyncedAt" to System.currentTimeMillis()
                 )
                 firestore.collection("users").document(user.id).set(userMap)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Silently fallback if offline or Firebase not yet initialized
             }
         }
