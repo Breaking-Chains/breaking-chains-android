@@ -22,7 +22,7 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         
-        buildConfigField("String", "ADMIN_EMAILS", "\"kaisarnajar11114@gmail.com,admin@example.com\"")
+        buildConfigField("String", "BASE_URL", "\"https://api.breakingchains.app/v1/\"")
     }
 
     buildTypes {
@@ -30,7 +30,7 @@ android {
             val customNotes = (project.findProperty("appDistributionReleaseNotes") as? String)
                 ?.takeIf { it.isNotBlank() }
                 ?: System.getenv("RELEASE_NOTES")
-                ?: "Breaking Chains Test Build"
+                ?: "Breaking Chains Client Baseline Build"
 
             firebaseAppDistribution {
                 testers = "kaisarnajar11114@gmail.com"
@@ -72,15 +72,14 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material.icons.extended)
 
-    // Room Database
-    implementation(libs.androidx.room.runtime)
-    implementation(libs.androidx.room.ktx)
-    ksp(libs.androidx.room.compiler)
+    // Network Client (API Integration)
+    implementation(libs.retrofit.core)
+    implementation(libs.retrofit.gson)
+    implementation(libs.okhttp.logging)
 
-    // Firebase (Using Firebase BOM)
+    // Firebase (Auth & Analytics)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
     implementation(libs.firebase.analytics)
 
     testImplementation(libs.junit)
